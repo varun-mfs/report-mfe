@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import WindowEventService from "news_layout/PubSub";
+import Reporting from "./components/Reporting";
+import ReportingWithInfiniteScroll from "./components/Report";
 
 import "./index.css";
 
@@ -44,10 +46,12 @@ const App = () => {
 
   return (
     <div className="container">
-      <div>Name: reporting-mfe</div>
+      {/* <div>Name: reporting-mfe</div>
       <div>Framework: react</div>
       <div>Language: JavaScript</div>
-      <div>CSS: Empty CSS</div>
+      <div>CSS: Empty CSS</div> */}
+      {/* <Reporting></Reporting> */}
+      <ReportingWithInfiniteScroll></ReportingWithInfiniteScroll>
     </div>
   );
 }
