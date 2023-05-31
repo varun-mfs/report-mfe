@@ -4,7 +4,7 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 const deps = require("./package.json").dependencies;
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3001/",
+    publicPath: "http://localhost:3003/",
   },
 
   resolve: {
@@ -12,7 +12,7 @@ module.exports = (_, argv) => ({
   },
 
   devServer: {
-    port: 3001,
+    port: 3003,
     historyApiFallback: true,
   },
 
@@ -44,9 +44,12 @@ module.exports = (_, argv) => ({
       name: "reporting_mfe",
       filename: "remoteEntry.js",
       remotes: {
-        news_layout: "news_layout@http://localhost:8081/remoteEntry.js"
+        news_layout: "news_layout@http://localhost:8081/remoteEntry.js",
+        news_app: "news_app@http://localhost:3000/remoteEntry.js"
       },
-      exposes: {},
+      exposes: {
+        "./ReportApp": "./src/App.js",
+      },
       shared: {
         ...deps,
         react: {

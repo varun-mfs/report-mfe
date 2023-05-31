@@ -22,21 +22,20 @@ const TableWithInfiniteScroll = () => {
   // for example, it could be a prop passed from the parent component
   // or come from some store
   const [hasMore] = useState(true)
-  const loadMore = useCallback(() => {
+  const loadMore =  useCallback(async() => {
     const loadItems = async () => {
-      await new Promise(resolve =>
-        setTimeout(() => {
-          getReportingData(setPage(page + 1));
+     
+         await getReportingData(setPage(page + 1));
           setLoading(false)
-          resolve()
-        }, 1500)
-      )
+       
+     
+      
     }
     setLoading(true)
     loadItems()
   }, [rows])
 
-  const scrollListener = useCallback(() => {
+  const scrollListener = useCallback( async() => {
     let bottom = tableEl.current.scrollHeight - tableEl.current.clientHeight
     // if you want to change distanceBottom every time new data is loaded
     // don't use the if statement
@@ -45,7 +44,7 @@ const TableWithInfiniteScroll = () => {
       setDistanceBottom(Math.round(bottom * 0.2))
     }
     if (tableEl.current.scrollTop > bottom - distanceBottom && hasMore && !loading) {
-      loadMore()
+     await loadMore()
     }
   }, [hasMore, loadMore, loading, distanceBottom]);
 
@@ -66,11 +65,13 @@ const TableWithInfiniteScroll = () => {
         // mode: 'no-cors',   // to handle CORS error
         body: JSON.stringify({ page })
       };
-      const apiUrl = `${Constants.BASE_URL}/getReportingData`;
+      console.log("check in useEffect");
+      const apiUrl = 'http://localhost:8181/getReportingData';
       // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
       const response = await fetch(apiUrl, requestOptions);
       let data = await response.json();
       setRows([...rows ,...data.data]);
+      console.log(`===>`, rows);
       // setRows(HardCodedData);   // TODO: remove this line
 
     } catch (error) {
@@ -82,7 +83,8 @@ const TableWithInfiniteScroll = () => {
   }, []);
 
   return (
-    <TableContainer style={{ maxWidth: '100%', margin: 'auto', maxHeight: '700px' }} ref={tableEl}>
+    // <TableContainer style={{ maxWidth: '100%', margin: 'auto', maxHeight: '700px' }} ref={tableEl}>
+    <TableContainer style={{ width: '100%', margin: 'auto', maxHeight: '700px' }} ref={tableEl}>
       {loading && <CircularProgress style={{ position: 'absolute', top: '45%', left: '45%' }} />}
       <Table stickyHeader>
         <TableHead>
@@ -94,7 +96,7 @@ const TableWithInfiniteScroll = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map(({ _id, title, url, clickCount, agencyId }, index) => (
+          {rows?.map(({ _id, title, url, clickCount, agencyId }, index) => (
               <TableRow
                 component={Link}
                 to={url}
@@ -104,7 +106,7 @@ const TableWithInfiniteScroll = () => {
                 key={index}
                 style={{textDecoration: "none", cursor: "pointer"}}
                 >
-                <TableCell>{agencyId.name}</TableCell>
+                <TableCell>{agencyId?.name}</TableCell>
                 <TableCell>{title}</TableCell>
                 {/* <TableCell><a href={url} target='_blank'>read</a></TableCell> */}
                 <TableCell>{clickCount}</TableCell>
