@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -6,21 +6,17 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { Link } from '@material-ui/core';
 
-const generateItems = amount => {
-  const arr = Array.from(Array(amount))
-  return arr.map((number, i) => ({
-    id: i,
-    name: `Name ${i + 1}`,
-    type: `Item Type ${i + 1}`,
-  }))
-}
+// TODO: remove this line
+// import HardCodedData from './Data';
 
 const TableWithInfiniteScroll = () => {
   const tableEl = useRef()
-  const [rows, setRows] = useState(generateItems(50))
+  const [rows, setRows] = useState([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false)
-  const [distanceBottom, setDistanceBottom] = useState(0)
+  const [distanceBottom, setDistanceBottom] = useState(0);
   // hasMore should come from the place where you do the data fetching
   // for example, it could be a prop passed from the parent component
   // or come from some store
@@ -29,8 +25,7 @@ const TableWithInfiniteScroll = () => {
     const loadItems = async () => {
       await new Promise(resolve =>
         setTimeout(() => {
-          const amount = rows.length + 50
-          setRows(generateItems(amount))
+          getReportingData(setPage(page + 1));
           setLoading(false)
           resolve()
         }, 2000)
@@ -61,22 +56,68 @@ const TableWithInfiniteScroll = () => {
     }
   }, [scrollListener]);
 
+  async function getReportingData() {
+    try {
+      // TODO: uncomment this line before commiting
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // mode: 'no-cors',   // to handle CORS error
+        body: JSON.stringify({ page })
+      };
+      console.log("check in useEffect");
+      const apiUrl = 'https://806e-2405-201-a014-b911-348d-80e9-4228-88e3.ngrok-free.app/getReportingData';
+      // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
+      const response = await fetch(apiUrl, requestOptions);
+      let data = await response.json();
+      console.log("data is: ", data);
+      setRows([...rows ,...data.data]);
+      // setRows(HardCodedData);   // TODO: remove this line before commiting
+
+    } catch (error) {
+      console.log("something went wrong while fetching data!", error);
+    }
+  }
+  useEffect(() => {
+    getReportingData();
+  }, []);
+
   return (
-    <TableContainer style={{ maxWidth: '650px', margin: 'auto', maxHeight: '700px' }} ref={tableEl}>
+    <TableContainer style={{ maxWidth: '100%', margin: 'auto', maxHeight: '700px' }} ref={tableEl}>
       {loading && <CircularProgress style={{ position: 'absolute', top: '45%', left: '45%' }} />}
       <Table stickyHeader>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Type</TableCell>
+            <TableCell>Agency Name</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Link</TableCell>
+            <TableCell>Count</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map(({ id, name, type }) => (
-            <TableRow key={id}>
-              <TableCell>{name}</TableCell>
-              <TableCell>{type}</TableCell>
-            </TableRow>
+          {rows.map(({ _id, title, url, clickCount, agencyId }) => (
+            // <Link to={url} >
+              <TableRow
+                component={Link}
+                to={url}
+                href={url}
+                target="_blank"
+                hover
+                key={_id}
+                // onClick={
+                //   (event) => handleClick(event, url)
+                //   // () => {
+                //   // setClickedLink(url); console.log("clickedLink AFTER", clickedLink);
+                //   // }
+                // }
+                style={{textDecoration: "none", cursor: "pointer"}}
+                >
+                <TableCell>{agencyId.name}</TableCell>
+                <TableCell>{title}</TableCell>
+                <TableCell><a href={url} target='_blank'>read</a></TableCell>
+                <TableCell>{clickCount}</TableCell>
+              </TableRow>
+            // </Link>
           ))}
         </TableBody>
       </Table>

@@ -28,17 +28,21 @@ const App = () => {
       // body: JSON.stringify({ title: 'React PUT Request Example' })
     };
 
-    WindowEventService.subscribe("clickedNews", async () => { console.log("successfully Subscribed!"); await increaseNewsReadCount(); });
-    
+    WindowEventService.subscribe("clickedNews", async () => {
+      // console.log("successfully Subscribed!");
+      await increaseNewsReadCount();
+    });
     async function increaseNewsReadCount() {
-      const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
-      const response = await fetch(apiUrl, requestOptions);
-      let data = await response.json();
-      console.log(data);
+      try {
+        // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
+        const apiUrl = 'https://de7d-2405-201-a014-b911-f031-5f33-b8f-5c10.ngrok-free.app/updateClickCount';
+        const response = await fetch(apiUrl, requestOptions);
+        let data = await response.json();
+      } catch (error) {
+        console.log("OOPS!, error", error)
+      }
     }
-    
-    
-    console.log("last");
+
     return () => {
       WindowEventService.unsubscribe("clickedNews", () => { console.log("successfully unsubscribed!") });
     }
