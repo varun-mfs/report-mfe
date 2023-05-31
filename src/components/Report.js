@@ -10,7 +10,7 @@ import { Link } from '@material-ui/core';
 import * as Constants from '../utils/constants';
 
 // TODO: remove this line
-import HardCodedData from './Data';
+// import HardCodedData from './Data';
 
 const TableWithInfiniteScroll = () => {
   const tableEl = useRef()
@@ -29,7 +29,7 @@ const TableWithInfiniteScroll = () => {
           getReportingData(setPage(page + 1));
           setLoading(false)
           resolve()
-        }, 2000)
+        }, 1500)
       )
     }
     setLoading(true)
@@ -66,12 +66,10 @@ const TableWithInfiniteScroll = () => {
         // mode: 'no-cors',   // to handle CORS error
         body: JSON.stringify({ page })
       };
-      console.log("check in useEffect");
       const apiUrl = `${Constants.BASE_URL}/getReportingData`;
       // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
       const response = await fetch(apiUrl, requestOptions);
       let data = await response.json();
-      console.log("data is: ", data);
       setRows([...rows ,...data.data]);
       // setRows(HardCodedData);   // TODO: remove this line
 
@@ -91,30 +89,24 @@ const TableWithInfiniteScroll = () => {
           <TableRow>
             <TableCell>Agency Name</TableCell>
             <TableCell>Title</TableCell>
-            <TableCell>Link</TableCell>
-            <TableCell>Count</TableCell>
+            {/* <TableCell>Link</TableCell> */}
+            <TableCell>Click Count</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map(({ _id, title, url, clickCount, agencyId }) => (
+          {rows.map(({ _id, title, url, clickCount, agencyId }, index) => (
               <TableRow
                 component={Link}
                 to={url}
                 href={url}
                 target="_blank"
                 hover
-                key={_id}
-                // onClick={
-                //   (event) => handleClick(event, url)
-                //   // () => {
-                //   // setClickedLink(url); console.log("clickedLink AFTER", clickedLink);
-                //   // }
-                // }
+                key={index}
                 style={{textDecoration: "none", cursor: "pointer"}}
                 >
                 <TableCell>{agencyId.name}</TableCell>
                 <TableCell>{title}</TableCell>
-                <TableCell><a href={url} target='_blank'>read</a></TableCell>
+                {/* <TableCell><a href={url} target='_blank'>read</a></TableCell> */}
                 <TableCell>{clickCount}</TableCell>
               </TableRow>
           ))}
