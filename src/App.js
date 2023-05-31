@@ -56,6 +56,7 @@ const App = () => {
       <div>Language: JavaScript</div>
       <div>CSS: Empty CSS</div> */}
       {/* <Reporting></Reporting> */}
+      <h1>Reporting Data</h1>
       <ReportingWithInfiniteScroll></ReportingWithInfiniteScroll>
     </div>
   );

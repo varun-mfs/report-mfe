@@ -22,15 +22,10 @@ const TableWithInfiniteScroll = () => {
   // for example, it could be a prop passed from the parent component
   // or come from some store
   const [hasMore] = useState(true)
-  const loadMore = useCallback(() => {
+  const loadMore = useCallback(async () => {
     const loadItems = async () => {
-      await new Promise(resolve =>
-        setTimeout(() => {
-          getReportingData(setPage(page + 1));
-          setLoading(false)
-          resolve()
-        }, 1500)
-      )
+      await getReportingData(setPage(page + 1));
+      setLoading(false)
     }
     setLoading(true)
     loadItems()
@@ -70,9 +65,8 @@ const TableWithInfiniteScroll = () => {
       // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
       const response = await fetch(apiUrl, requestOptions);
       let data = await response.json();
-      setRows([...rows ,...data.data]);
+      setRows([...rows, ...data.data]);
       // setRows(HardCodedData);   // TODO: remove this line
-
     } catch (error) {
       console.log("something went wrong while fetching data!", error);
     }
@@ -95,20 +89,20 @@ const TableWithInfiniteScroll = () => {
         </TableHead>
         <TableBody>
           {rows.map(({ _id, title, url, clickCount, agencyId }, index) => (
-              <TableRow
-                component={Link}
-                to={url}
-                href={url}
-                target="_blank"
-                hover
-                key={index}
-                style={{textDecoration: "none", cursor: "pointer"}}
-                >
-                <TableCell>{agencyId.name}</TableCell>
-                <TableCell>{title}</TableCell>
-                {/* <TableCell><a href={url} target='_blank'>read</a></TableCell> */}
-                <TableCell>{clickCount}</TableCell>
-              </TableRow>
+            <TableRow
+              component={Link}
+              to={url}
+              href={url}
+              target="_blank"
+              hover
+              key={index}
+              style={{ textDecoration: "none", cursor: "pointer" }}
+            >
+              <TableCell>{agencyId.name}</TableCell>
+              <TableCell>{title}</TableCell>
+              {/* <TableCell><a href={url} target='_blank'>read</a></TableCell> */}
+              <TableCell>{clickCount}</TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
