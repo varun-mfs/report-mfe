@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import WindowEventService from "news_layout/PubSub";
 import Reporting from "./components/Reporting";
 import ReportingWithInfiniteScroll from "./components/Report";
+import { BASE_URL } from './utils/constants';
 
 import "./index.css";
 
@@ -35,7 +36,7 @@ const App = () => {
     async function increaseNewsReadCount() {
       try {
         // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
-        const apiUrl = 'https://de7d-2405-201-a014-b911-f031-5f33-b8f-5c10.ngrok-free.app/updateClickCount';
+        const apiUrl = `${BASE_URL}updateClickCount`;
         const response = await fetch(apiUrl, requestOptions);
         let data = await response.json();
       } catch (error) {

@@ -7,9 +7,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { Link } from '@material-ui/core';
+import * as Constants from '../utils/constants';
 
 // TODO: remove this line
-// import HardCodedData from './Data';
+import HardCodedData from './Data';
 
 const TableWithInfiniteScroll = () => {
   const tableEl = useRef()
@@ -58,7 +59,7 @@ const TableWithInfiniteScroll = () => {
 
   async function getReportingData() {
     try {
-      // TODO: uncomment this line before commiting
+      // TODO: uncomment this line
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,13 +67,13 @@ const TableWithInfiniteScroll = () => {
         body: JSON.stringify({ page })
       };
       console.log("check in useEffect");
-      const apiUrl = 'https://806e-2405-201-a014-b911-348d-80e9-4228-88e3.ngrok-free.app/getReportingData';
+      const apiUrl = `${Constants.BASE_URL}/getReportingData`;
       // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
       const response = await fetch(apiUrl, requestOptions);
       let data = await response.json();
       console.log("data is: ", data);
       setRows([...rows ,...data.data]);
-      // setRows(HardCodedData);   // TODO: remove this line before commiting
+      // setRows(HardCodedData);   // TODO: remove this line
 
     } catch (error) {
       console.log("something went wrong while fetching data!", error);
@@ -96,7 +97,6 @@ const TableWithInfiniteScroll = () => {
         </TableHead>
         <TableBody>
           {rows.map(({ _id, title, url, clickCount, agencyId }) => (
-            // <Link to={url} >
               <TableRow
                 component={Link}
                 to={url}
@@ -117,7 +117,6 @@ const TableWithInfiniteScroll = () => {
                 <TableCell><a href={url} target='_blank'>read</a></TableCell>
                 <TableCell>{clickCount}</TableCell>
               </TableRow>
-            // </Link>
           ))}
         </TableBody>
       </Table>
