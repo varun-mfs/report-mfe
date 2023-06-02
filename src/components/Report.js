@@ -1,79 +1,78 @@
-import React, { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { Button, Link } from '@mui/material';
-import * as Constants from '../utils/constants';
-import ReactToPdf from 'react-to-pdf';
-
-// TODO: remove this line
-// import HardCodedData from './Data';
+import React, {
+  useState,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+  useEffect,
+} from "react";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { Button, Link } from "@mui/material";
+import generatePDF from "../utils/generate-pdf";
 
 const TableWithInfiniteScroll = () => {
-  const tableEl = useRef()
+  const tableEl = useRef();
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [distanceBottom, setDistanceBottom] = useState(0);
   const ref = React.createRef();
   // hasMore should come from the place where you do the data fetching
   // for example, it could be a prop passed from the parent component
   // or come from some store
-  const [hasMore] = useState(true)
-  const loadMore =  useCallback(async() => {
+  const [hasMore] = useState(true);
+  const loadMore = useCallback(async () => {
     const loadItems = async () => {
-     
-         await getReportingData(setPage(page + 1));
-          setLoading(false)
-       
-     
-      
-    }
-    setLoading(true)
-    loadItems()
-  }, [rows])
+      await getReportingData(setPage(page + 1));
+      setLoading(false);
+    };
+    setLoading(true);
+    loadItems();
+  }, [rows]);
 
-  const scrollListener = useCallback( async() => {
-    let bottom = tableEl.current.scrollHeight - tableEl.current.clientHeight
+  const scrollListener = useCallback(async () => {
+    let bottom = tableEl.current.scrollHeight - tableEl.current.clientHeight;
     // if you want to change distanceBottom every time new data is loaded
     // don't use the if statement
     if (!distanceBottom) {
       // calculate distanceBottom that works for you
-      setDistanceBottom(Math.round(bottom * 0.2))
+      setDistanceBottom(Math.round(bottom * 0.2));
     }
-    if (tableEl.current.scrollTop > bottom - distanceBottom && hasMore && !loading) {
-     await loadMore()
+    if (
+      tableEl.current.scrollTop > bottom - distanceBottom &&
+      hasMore &&
+      !loading
+    ) {
+      await loadMore();
     }
   }, [hasMore, loadMore, loading, distanceBottom]);
 
   useLayoutEffect(() => {
-    const tableRef = tableEl.current
-    tableRef.addEventListener('scroll', scrollListener)
+    const tableRef = tableEl.current;
+    tableRef.addEventListener("scroll", scrollListener);
     return () => {
-      tableRef.removeEventListener('scroll', scrollListener)
-    }
+      tableRef.removeEventListener("scroll", scrollListener);
+    };
   }, [scrollListener]);
 
   async function getReportingData() {
     try {
       // TODO: uncomment this line
       const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         // mode: 'no-cors',   // to handle CORS error
-        body: JSON.stringify({ page })
+        body: JSON.stringify({ page }),
       };
-      console.log("check in useEffect");
-      const apiUrl = 'http://localhost:8181/getReportingData';
-      // const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1';
+      const apiUrl = "http://localhost:8181/getReportingData";
       const response = await fetch(apiUrl, requestOptions);
       let data = await response.json();
       setRows([...rows, ...data.data]);
-      // setRows(HardCodedData);   // TODO: remove this line
     } catch (error) {
       console.log("something went wrong while fetching data!", error);
     }
@@ -82,23 +81,36 @@ const TableWithInfiniteScroll = () => {
     getReportingData();
   }, []);
 
-  const options = {
-    orientation: 'landscape',
-    unit: 'in',
-    format: [10, 8]
+  const handleButtonClick = async () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+    const apiUrl = "http://localhost:8181/getReportingData";
+    const response = await fetch(apiUrl, requestOptions);
+    let data = await response.json();
+    generatePDF(data.data);
   };
 
   return (
     <>
-      <ReactToPdf style={{marginBottom: '30px'}} targetRef={tableEl} options={options} x={.5} y={.5} scale={0.8}>
-        {({ toPdf, targetRef }) => (
-          <Button variant='contained' sx={{float: "right"}} onClick={toPdf} ref={targetRef} disableElevation >
-            Download as PDF
-          </Button>
+      <Button
+        variant="contained"
+        sx={{ float: "right" }}
+        onClick={handleButtonClick}
+        disableElevation
+      >
+        Download as PDF
+      </Button>
+      <TableContainer
+        style={{ maxWidth: "100%", margin: "auto", maxHeight: "700px" }}
+        ref={tableEl}
+      >
+        {loading && (
+          <CircularProgress
+            style={{ position: "absolute", top: "45%", left: "45%" }}
+          />
         )}
-      </ReactToPdf>
-      <TableContainer style={{ maxWidth: '100%', margin: 'auto', maxHeight: '700px' }} ref={tableEl}>
-        {loading && <CircularProgress style={{ position: 'absolute', top: '45%', left: '45%' }} />}
         <Table stickyHeader>
           <TableHead>
             <TableRow>
@@ -117,8 +129,8 @@ const TableWithInfiniteScroll = () => {
                 target="_blank"
                 hover
                 key={index}
-                style={{textDecoration: "none", cursor: "pointer"}}
-                >
+                style={{ textDecoration: "none", cursor: "pointer" }}
+              >
                 <TableCell>{agencyId?.name}</TableCell>
                 <TableCell>{title}</TableCell>
                 {/* <TableCell><a href={url} target='_blank'>read</a></TableCell> */}
@@ -129,6 +141,6 @@ const TableWithInfiniteScroll = () => {
         </Table>
       </TableContainer>
     </>
-  )
-}
+  );
+};
 export default TableWithInfiniteScroll;
