@@ -1,0 +1,17 @@
+version: '3.8'
+
+networks:
+  newsforyou:
+
+services:
+  report-app:
+    container_name: news-report-container
+    image: news-report:0.1
+    restart: on-failure
+    build:
+      context: ./
+    ports:
+      - 3003:3003
+    networks:
+      - newsforyou
+      

@@ -69,7 +69,7 @@ const TableWithInfiniteScroll = () => {
         // mode: 'no-cors',   // to handle CORS error
         body: JSON.stringify({ page }),
       };
-      const apiUrl = "http://localhost:8181/getReportingData";
+      const apiUrl = "http://report-service.localhost/getReportingData";
       const response = await fetch(apiUrl, requestOptions);
       let data = await response.json();
       setRows([...rows, ...data.data]);
@@ -86,7 +86,7 @@ const TableWithInfiniteScroll = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     };
-    const apiUrl = "http://localhost:8181/getReportingData";
+    const apiUrl = "http://report-service.localhost/getReportingData";
     const response = await fetch(apiUrl, requestOptions);
     let data = await response.json();
     generatePDF(data.data);

@@ -11,7 +11,7 @@ const generatePDF = (newsFeed) => {
     if (news.title.length > 60) {
       title = news.title.substring(0, 60).concat("...");
     }
-    const newsData = [news.agencyId.name, title, news.clickCount];
+    const newsData = [news?.agencyId?.name, title, news?.clickCount];
     tableRows.push(newsData);
   });
 
